@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/util"
+	"github.com/sulrex/gopay/common"
+	"github.com/sulrex/gopay/util"
 )
 
 var defaultWechatAppClient *WechatAppClient

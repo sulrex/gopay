@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/milkbobo/gopay/common"
 	"github.com/shopspring/decimal"
+	"github.com/sulrex/gopay/common"
 )
 
 // WechatGenSign 微信签名

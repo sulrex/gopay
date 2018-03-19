@@ -4,9 +4,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/milkbobo/gopay/client"
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/constant"
+	"github.com/sulrex/gopay/client"
+	"github.com/sulrex/gopay/common"
+	"github.com/sulrex/gopay/constant"
 )
 
 // Pay 获取支付接口
