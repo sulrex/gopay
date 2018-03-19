@@ -7,12 +7,14 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/milkbobo/gopay/common"
-	"github.com/shopspring/decimal"
 	"sort"
 	"strings"
+
+	"github.com/milkbobo/gopay/common"
+	"github.com/shopspring/decimal"
 )
 
+// WechatGenSign 微信签名
 func WechatGenSign(key string, m map[string]string) (string, error) {
 	var signData []string
 	for k, v := range m {
@@ -37,6 +39,7 @@ func WechatGenSign(key string, m map[string]string) (string, error) {
 	return strings.ToUpper(fmt.Sprintf("%x", signByte)), nil
 }
 
+// TruncatedText ..
 func TruncatedText(data string, length int) string {
 	data = FilterTheSpecialSymbol(data)
 	if len([]rune(data)) > length {
@@ -45,19 +48,19 @@ func TruncatedText(data string, length int) string {
 	return data
 }
 
-//过滤特殊符号
+// FilterTheSpecialSymbol 过滤特殊符号
 func FilterTheSpecialSymbol(data string) string {
 	// 定义转换规则
 	specialSymbol := func(r rune) rune {
-		if r == '`' || r == '[' || r == '~' || r == '!' || r == '@' || r == '#' || r == '$' ||
-			r == '^' || r == '&' || r == '*' || r == '~' || r == '(' || r == ')' || r == '=' ||
-			r == '~' || r == '|' || r == '{' || r == '}' || r == '~' || r == ':' || r == ';' ||
+		if r == '`' || r == '~' || r == '!' || r == '@' || r == '#' || r == '$' ||
+			r == '^' || r == '&' || r == '*' || r == '(' || r == ')' || r == '=' ||
+			r == '|' || r == '{' || r == '}' || r == ':' || r == ';' ||
 			r == '\'' || r == ',' || r == '\\' || r == '[' || r == ']' || r == '.' || r == '<' ||
-			r == '>' || r == '/' || r == '?' || r == '~' || r == '！' || r == '@' || r == '#' ||
-			r == '￥' || r == '…' || r == '&' || r == '*' || r == '（' || r == '）' || r == '—' ||
-			r == '|' || r == '{' || r == '}' || r == '【' || r == '】' || r == '‘' || r == '；' ||
-			r == '：' || r == '”' || r == '“' || r == '\'' || r == '"' || r == '。' || r == '，' ||
-			r == '、' || r == '？' || r == '%' || r == '+' || r == '_' || r == ']' || r == '"' || r == '&' {
+			r == '>' || r == '/' || r == '?' || r == '！' ||
+			r == '￥' || r == '…' || r == '（' || r == '）' || r == '—' ||
+			r == '【' || r == '】' || r == '‘' || r == '；' ||
+			r == '：' || r == '”' || r == '“' || r == '"' || r == '。' || r == '，' ||
+			r == '、' || r == '？' || r == '%' || r == '+' || r == '_' {
 			return ' '
 		}
 		return r
@@ -66,7 +69,7 @@ func FilterTheSpecialSymbol(data string) string {
 	return strings.Replace(data, "\n", " ", -1)
 }
 
-//对微信下订单或者查订单
+// PostWechat 对微信下订单或者查订单
 func PostWechat(url string, data map[string]string) (common.WeChatQueryResult, error) {
 	var xmlRe common.WeChatQueryResult
 	buf := bytes.NewBufferString("")
@@ -75,8 +78,8 @@ func PostWechat(url string, data map[string]string) (common.WeChatQueryResult, e
 		buf.WriteString(fmt.Sprintf("<%s><![CDATA[%s]]></%s>", k, v, k))
 	}
 	xmlStr := fmt.Sprintf("<xml>%s</xml>", buf.String())
-
-	re, err := HTTPSC.PostData(url, "text/xml:charset=UTF-8", xmlStr)
+	// fmt.Println(xmlStr)
+	re, err := HTTPSC.PostData(url, "text/xml;charset=UTF-8", xmlStr)
 	if err != nil {
 		return xmlRe, errors.New("HTTPSC.PostData: " + err.Error())
 	}
@@ -98,7 +101,7 @@ func PostWechat(url string, data map[string]string) (common.WeChatQueryResult, e
 	return xmlRe, nil
 }
 
-//对支付宝者查订单
+// GetAlipay 对支付宝者查订单
 func GetAlipay(url string) (common.AliWebQueryResult, error) {
 	var xmlRe common.AliWebQueryResult
 
@@ -113,7 +116,7 @@ func GetAlipay(url string) (common.AliWebQueryResult, error) {
 	return xmlRe, nil
 }
 
-//对支付宝者查订单
+// GetAlipayApp 对支付宝者查订单
 func GetAlipayApp(urls string) (common.AliWebAppQueryResult, error) {
 	var aliPay common.AliWebAppQueryResult
 
@@ -130,23 +133,23 @@ func GetAlipayApp(urls string) (common.AliWebAppQueryResult, error) {
 	return aliPay, nil
 }
 
-// ToURL
-func ToURL(payUrl string, m map[string]string) string {
+// ToURL ..
+func ToURL(payURL string, m map[string]string) string {
 	var buf []string
 	for k, v := range m {
 		buf = append(buf, fmt.Sprintf("%s=%s", k, v))
 	}
-	return fmt.Sprintf("%s?%s", payUrl, strings.Join(buf, "&"))
+	return fmt.Sprintf("%s?%s", payURL, strings.Join(buf, "&"))
 }
 
-// 微信金额浮点转字符串
+// WechatMoneyFeeToString 微信金额浮点转字符串
 func WechatMoneyFeeToString(moneyFee float64) string {
 	aDecimal := decimal.NewFromFloat(moneyFee)
 	bDecimal := decimal.NewFromFloat(100)
 	return aDecimal.Mul(bDecimal).Truncate(0).String()
 }
 
-// 支付宝金额转字符串
+// AliyunMoneyFeeToString 支付宝金额转字符串
 func AliyunMoneyFeeToString(moneyFee float64) string {
 	return decimal.NewFromFloat(moneyFee).Truncate(2).String()
 }

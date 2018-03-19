@@ -8,16 +8,18 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/milkbobo/gopay/common"
-	"github.com/go-errors/errors"
 	"net/url"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/go-errors/errors"
+	"github.com/milkbobo/gopay/common"
 )
 
 var defaultAliAppClient *AliAppClient
 
+// AliAppClient ..
 type AliAppClient struct {
 	SellerID   string //合作者ID
 	AppID      string // 应用ID
@@ -25,6 +27,7 @@ type AliAppClient struct {
 	PublicKey  *rsa.PublicKey
 }
 
+// InitAliAppClient ..
 func InitAliAppClient(c *AliAppClient) {
 	defaultAliAppClient = c
 }
@@ -34,10 +37,11 @@ func DefaultAliAppClient() *AliAppClient {
 	return defaultAliAppClient
 }
 
-func (this *AliAppClient) Pay(charge *common.Charge) (map[string]string, error) {
+// Pay ..
+func (ac *AliAppClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
 	var bizContent = make(map[string]string)
-	m["app_id"] = this.AppID
+	m["app_id"] = ac.AppID
 	m["method"] = "alipay.trade.app.pay"
 	m["format"] = "JSON"
 	m["charset"] = "utf-8"
@@ -50,43 +54,43 @@ func (this *AliAppClient) Pay(charge *common.Charge) (map[string]string, error) 
 	bizContent["product_code"] = "QUICK_MSECURITY_PAY"
 	bizContent["total_amount"] = AliyunMoneyFeeToString(charge.MoneyFee)
 
-	bizContentJson, err := json.Marshal(bizContent)
+	bizContentJSON, err := json.Marshal(bizContent)
 	if err != nil {
 		return map[string]string{}, errors.New("json.Marshal: " + err.Error())
 	}
-	m["biz_content"] = string(bizContentJson)
+	m["biz_content"] = string(bizContentJSON)
 
-	m["sign"] = this.GenSign(m)
+	m["sign"] = ac.GenSign(m)
 
-	return map[string]string{"orderString": this.ToURL(m)}, nil
+	return map[string]string{"orderString": ac.ToURL(m)}, nil
 }
 
-// 订单查询
-func (this *AliAppClient) QueryOrder(outTradeNo string) (common.AliWebAppQueryResult, error) {
+// QueryOrder 订单查询
+func (ac *AliAppClient) QueryOrder(outTradeNo string) (common.AliWebAppQueryResult, error) {
 	var m = make(map[string]string)
 	m["method"] = "alipay.trade.query"
-	m["app_id"] = this.AppID
+	m["app_id"] = ac.AppID
 	m["format"] = "JSON"
 	m["charset"] = "utf-8"
 	m["timestamp"] = time.Now().Format("2006-01-02 15:04:05")
 	m["version"] = "1.0"
 	m["sign_type"] = "RSA"
 	bizContent := map[string]string{"out_trade_no": outTradeNo}
-	bizContentJson, err := json.Marshal(bizContent)
+	bizContentJSON, err := json.Marshal(bizContent)
 	if err != nil {
 		return common.AliWebAppQueryResult{}, errors.New("json.Marshal: " + err.Error())
 	}
-	m["biz_content"] = string(bizContentJson)
-	sign := this.GenSign(m)
+	m["biz_content"] = string(bizContentJSON)
+	sign := ac.GenSign(m)
 	m["sign"] = sign
 
-	url := fmt.Sprintf("%s?%s", "https://openapi.alipay.com/gateway.do", this.ToURL(m))
+	url := fmt.Sprintf("%s?%s", "https://openapi.alipay.com/gateway.do", ac.ToURL(m))
 
 	return GetAlipayApp(url)
 }
 
 // GenSign 产生签名
-func (this *AliAppClient) GenSign(m map[string]string) string {
+func (ac *AliAppClient) GenSign(m map[string]string) string {
 	var data []string
 
 	for k, v := range m {
@@ -103,7 +107,7 @@ func (this *AliAppClient) GenSign(m map[string]string) string {
 		panic(err)
 	}
 	hashByte := s.Sum(nil)
-	signByte, err := this.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA1)
+	signByte, err := ac.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA1)
 	if err != nil {
 		panic(err)
 	}
@@ -112,7 +116,7 @@ func (this *AliAppClient) GenSign(m map[string]string) string {
 }
 
 // CheckSign 检测签名
-func (this *AliAppClient) CheckSign(signData, sign string) {
+func (ac *AliAppClient) CheckSign(signData, sign string) {
 	signByte, err := base64.StdEncoding.DecodeString(sign)
 	if err != nil {
 		panic(err)
@@ -123,14 +127,14 @@ func (this *AliAppClient) CheckSign(signData, sign string) {
 		panic(err)
 	}
 	hash := s.Sum(nil)
-	err = rsa.VerifyPKCS1v15(this.PublicKey, crypto.SHA1, hash, signByte)
+	err = rsa.VerifyPKCS1v15(ac.PublicKey, crypto.SHA1, hash, signByte)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// ToURL
-func (this *AliAppClient) ToURL(m map[string]string) string {
+// ToURL ..
+func (ac *AliAppClient) ToURL(m map[string]string) string {
 	var buf []string
 	for k, v := range m {
 		buf = append(buf, fmt.Sprintf("%s=%s", k, url.QueryEscape(v)))

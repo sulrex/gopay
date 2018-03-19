@@ -9,12 +9,14 @@ import (
 	"sort"
 	"strings"
 
+	"encoding/json"
+
 	"github.com/milkbobo/gopay/client"
 	"github.com/milkbobo/gopay/common"
 	"github.com/milkbobo/gopay/util"
-	"encoding/json"
 )
 
+// AliWebCallback ..
 func AliWebCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayResult, error) {
 	var m = make(map[string]string)
 	var signSlice []string
@@ -48,7 +50,7 @@ func AliWebCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayRe
 	return &aliPay, nil
 }
 
-// 支付宝app支付回调
+// AliAppCallback 支付宝app支付回调
 func AliAppCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayResult, error) {
 	var result string
 	defer func() {
@@ -90,7 +92,7 @@ func AliAppCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayRe
 	return &aliPay, nil
 }
 
-// WeChatCallback 微信支付
+// WeChatWebCallback 微信支付（取key出现了panic, 加上有多商户使用情况，不直接调用这里的callback，另外实现)
 func WeChatWebCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPayResult, error) {
 	var returnCode = "FAIL"
 	var returnMsg = ""
@@ -104,14 +106,14 @@ func WeChatWebCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPa
 	//body := cb.Ctx.Input.RequestBody
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		//log.Error(string(body))
+		// log.Println(string(body))
 		returnCode = "FAIL"
 		returnMsg = "Bodyerror"
 		panic(err)
 	}
 	err = xml.Unmarshal(body, &reXML)
 	if err != nil {
-		//log.Error(err, string(body))
+		// log.Println(err, string(body))
 		returnMsg = "参数错误"
 		returnCode = "FAIL"
 		panic(err)
@@ -147,6 +149,7 @@ func WeChatWebCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPa
 	return &reXML, nil
 }
 
+// WeChatAppCallback ..
 func WeChatAppCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPayResult, error) {
 	var returnCode = "FAIL"
 	var returnMsg = ""
@@ -160,21 +163,21 @@ func WeChatAppCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPa
 	//body := cb.Ctx.Input.RequestBody
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		//log.Error(string(body))
+		// log.Println(string(body))
 		returnCode = "FAIL"
 		returnMsg = "Bodyerror"
 		panic(err)
 	}
 	err = xml.Unmarshal(body, &reXML)
 	if err != nil {
-		//log.Error(err, string(body))
+		// log.Println(err, string(body))
 		returnMsg = "参数错误"
 		returnCode = "FAIL"
 		panic(err)
 	}
 
 	if reXML.ReturnCode != "SUCCESS" {
-		//log.Error(reXML)
+		// log.Error(reXML)
 		returnCode = "FAIL"
 		return &reXML, errors.New(reXML.ReturnCode)
 	}

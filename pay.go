@@ -2,24 +2,26 @@ package gopay
 
 import (
 	"errors"
+	"log"
+
 	"github.com/milkbobo/gopay/client"
 	"github.com/milkbobo/gopay/common"
 	"github.com/milkbobo/gopay/constant"
 )
 
-// 获取支付接口
+// Pay 获取支付接口
 func Pay(charge *common.Charge) (map[string]string, error) {
 	err := checkCharge(charge)
 	if err != nil {
-		//log.Error(err, charge)
-		panic(err)
+		log.Println("支付失败:", err, charge)
+		return nil, err
 	}
 
 	ct := getPayClient(charge.PayMethod)
 	re, err := ct.Pay(charge)
 	if err != nil {
-		//log.Error("支付失败:", err, charge)
-		panic(err)
+		log.Println("支付失败:", err, charge)
+		return nil, err
 	}
 	return re, err
 }
@@ -39,10 +41,10 @@ func checkCharge(charge *common.Charge) error {
 func getPayClient(payMethod int64) common.PayClient {
 	//如果使用余额支付
 	switch payMethod {
-	 case constant.ALI_WEB:
-	 	return client.DefaultAliWebClient()
-	 case constant.ALI_APP:
-	 	return client.DefaultAliAppClient()
+	case constant.ALI_WEB:
+		return client.DefaultAliWebClient()
+	case constant.ALI_APP:
+		return client.DefaultAliAppClient()
 	case constant.WECHAT_WEB:
 		return client.DefaultWechatWebClient()
 	case constant.WECHAT_APP:
