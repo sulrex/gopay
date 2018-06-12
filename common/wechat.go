@@ -1,6 +1,6 @@
 package common
 
-// WeChatResult 微信支付返回
+// WeChatReResult 微信支付返回
 type WeChatReResult struct {
 	//ReturnCode string `xml:"return_code"`
 	//ReturnMsg  string `xml:"return_msg"`
@@ -15,8 +15,8 @@ type WeChatReResult struct {
 	//ErrCodeDes string `xml:"err_code_des"`
 
 	//TradeType string `xml:"trade_type"`
-	PrepayID  string `xml:"prepay_id"`
-	CodeURL   string `xml:"code_url"`
+	PrepayID string `xml:"prepay_id"`
+	CodeURL  string `xml:"code_url"`
 }
 
 // WechatBaseResult 基本信息
@@ -53,12 +53,14 @@ type WechatResultData struct {
 	TimeEnd       string `xml:"time_end,omitempty"`
 }
 
+// WeChatPayResult ...
 type WeChatPayResult struct {
 	WechatBaseResult
 	WechatReturnData
 	WechatResultData
 }
 
+// WeChatQueryResult ...
 type WeChatQueryResult struct {
 	WechatBaseResult
 	WeChatReResult

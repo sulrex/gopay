@@ -25,6 +25,8 @@ func DefaultWechatWebClient() *WechatWebClient {
 type WechatWebClient struct {
 	AppID       string // 公众账号ID
 	MchID       string // 商户号ID
+	SubMch      bool   // 服务商模式
+	SubMchID    string // 服务商模式子商户号
 	CallbackURL string // 回调地址
 	Key         string // 密钥
 	PayURL      string // 支付地址
@@ -36,6 +38,9 @@ func (wc *WechatWebClient) Pay(charge *common.Charge) (map[string]string, error)
 	var m = make(map[string]string)
 	m["appid"] = wc.AppID
 	m["mch_id"] = wc.MchID
+	if wc.SubMch {
+		m["sub_mch_id"] = wc.SubMchID
+	}
 	m["nonce_str"] = util.RandomStr()
 	m["body"] = TruncatedText(charge.Describe, 32)
 	m["out_trade_no"] = charge.TradeNum

@@ -5,7 +5,7 @@ type AliWebPayResult struct {
 	NotifyTime       string `json:"notify_time"`
 	NotifyType       string `json:"notify_type"`
 	NotifyID         string `json:"notify_id"`
-	AppId            string `json:"app_id"`
+	AppID            string `json:"app_id"`
 	Charset          string `json:"charset"`
 	Version          string `json:"version"`
 	SignType         string `json:"sign_type"`
@@ -35,11 +35,13 @@ type AliWebPayResult struct {
 	AliQueryResult
 }
 
+// FundBill ...
 type FundBill struct {
 	FundChannel string `json:"fundChannel"`
 	Amount      string `json:"amount"`
 }
 
+// AliQueryResult ...
 type AliQueryResult struct {
 	TradeNo             string     `json:"trade_no"`
 	OutTradeNo          string     `json:"out_trade_no"`
@@ -64,6 +66,7 @@ type AliQueryResult struct {
 	PassbackParams      string     `json:"passback_params"`
 }
 
+// AliWebQueryResult ...
 type AliWebQueryResult struct {
 	IsSuccess string `xml:"is_success"`
 	ErrorMsg  string `xml:"error"`
@@ -72,7 +75,7 @@ type AliWebQueryResult struct {
 	Response  struct {
 		Trade struct {
 			BuyerEmail          string `xml:"buyer_email"`
-			BuyerId             string `xml:"buyer_id"`
+			BuyerID             string `xml:"buyer_id"`
 			SellerID            string `xml:"seller_id"`
 			TradeStatus         string `xml:"trade_status"`
 			IsTotalFeeAdjust    string `xml:"is_total_fee_adjust"`
@@ -90,6 +93,7 @@ type AliWebQueryResult struct {
 	} `xml:"response"`
 }
 
+// AliWebAppQueryResult ...
 type AliWebAppQueryResult struct {
 	AlipayTradeQueryResponse struct {
 		Code                string `json:"code"`
@@ -98,8 +102,8 @@ type AliWebAppQueryResult struct {
 		SubMsg              string `json:"sub_msg"`
 		TradeNo             string `json:"trade_no"`
 		OutTradeNo          string `json:"out_trade_no"`
-		OpenId              string `json:"open_id"`
-		BuyerLogonId        string `json:"buyer_logon_id"`
+		OpenID              string `json:"open_id"`
+		BuyerLogonID        string `json:"buyer_logon_id"`
 		TradeStatus         string `json:"trade_status"`
 		TotalAmount         string `json:"total_amount"`
 		ReceiptAmount       string `json:"receipt_amount"`
@@ -107,11 +111,11 @@ type AliWebAppQueryResult struct {
 		PointAmount         string `json:"point_amount"`
 		InvoiceAmount       string `json:"invoice_amount"`
 		SendPayDate         string `json:"send_pay_date"`
-		AlipayStoreId       string `json:"alipay_store_id"`
-		StoreId             string `json:"store_id"`
-		TerminalId          string `json:"terminal_id"`
+		AlipayStoreID       string `json:"alipay_store_id"`
+		StoreID             string `json:"store_id"`
+		TerminalID          string `json:"terminal_id"`
 		StoreName           string `json:"store_name"`
-		BuyerUserId         string `json:"buyer_user_id"`
+		BuyerUserID         string `json:"buyer_user_id"`
 		DiscountGoodsDetail string `json:"discount_goods_detail"`
 		IndustrySepcDetail  string `json:"industry_sepc_detail"`
 	} `json:"alipay_trade_query_response"`

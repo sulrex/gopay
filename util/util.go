@@ -27,6 +27,7 @@ func LocalIP() string {
 	return ""
 }
 
+// MapStringToStruct ...
 func MapStringToStruct(m map[string]string, i interface{}) error {
 	bin, err := json.Marshal(m)
 	if err != nil {

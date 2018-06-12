@@ -7,7 +7,9 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -142,14 +144,39 @@ func ToURL(payURL string, m map[string]string) string {
 	return fmt.Sprintf("%s?%s", payURL, strings.Join(buf, "&"))
 }
 
-// WechatMoneyFeeToString 微信金额浮点转字符串
+// WechatMoneyFeeToString 微信金额浮点转字符串（issue: 0.03 -> 2 not 3）
+// func WechatMoneyFeeToString(moneyFee float64) string {
+// 	aDecimal := decimal.NewFromFloat(moneyFee)
+// 	bDecimal := decimal.NewFromFloat(100)
+// 	return aDecimal.Mul(bDecimal).Truncate(0).String()
+// }
+
+// WechatMoneyFeeToString 微信金额浮点转字符串（元*100 -> 分)
 func WechatMoneyFeeToString(moneyFee float64) string {
-	aDecimal := decimal.NewFromFloat(moneyFee)
-	bDecimal := decimal.NewFromFloat(100)
-	return aDecimal.Mul(bDecimal).Truncate(0).String()
+	moneyFee = RoundFloat(moneyFee*100, 0)
+	return strconv.FormatFloat(moneyFee, 'f', 0, 64)
 }
 
 // AliyunMoneyFeeToString 支付宝金额转字符串
 func AliyunMoneyFeeToString(moneyFee float64) string {
 	return decimal.NewFromFloat(moneyFee).Truncate(2).String()
+}
+
+// RoundFloat 浮点数按精度取整
+//Round(±0) = ±0, Round(±Inf) = ±Inf, Round(NaN) = NaN
+func RoundFloat(x float64, prec int) float64 {
+	var rounder float64
+	pow := math.Pow(10, float64(prec))
+	intermed := x * pow
+	_, frac := math.Modf(intermed)
+	x = .5
+	if frac < 0.0 {
+		x = -.5
+	}
+	if frac >= x {
+		rounder = math.Ceil(intermed)
+	} else {
+		rounder = math.Floor(intermed)
+	}
+	return rounder / pow
 }

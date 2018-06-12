@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// XmlToMap ...
 func XmlToMap(xmlData []byte) map[string]string {
 	decoder := xml.NewDecoder(bytes.NewReader(xmlData))
 	m := make(map[string]string)
