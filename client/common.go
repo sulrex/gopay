@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shopspring/decimal"
 	"github.com/sulrex/gopay/common"
 )
 
@@ -159,7 +158,8 @@ func WechatMoneyFeeToString(moneyFee float64) string {
 
 // AliyunMoneyFeeToString 支付宝金额转字符串
 func AliyunMoneyFeeToString(moneyFee float64) string {
-	return decimal.NewFromFloat(moneyFee).Truncate(2).String()
+	moneyFee = RoundFloat(moneyFee, 2)
+	return strconv.FormatFloat(moneyFee, 'f', 2, 64)
 }
 
 // RoundFloat 浮点数按精度取整

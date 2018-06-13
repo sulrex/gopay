@@ -13,7 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-errors/errors"
+	"errors"
+
 	"github.com/sulrex/gopay/common"
 )
 
