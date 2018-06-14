@@ -51,6 +51,7 @@ func (ac *AliWebClient) Pay(charge *common.Charge) (map[string]string, error) {
 	m := make(map[string]string)
 	m["app_id"] = ac.AppID
 	m["method"] = "alipay.trade.wap.pay"
+	m["return_url"] = charge.CallbackURL
 	m["charset"] = "utf-8"
 	m["sign_type"] = "RSA2"
 	m["timestamp"] = time.Now().Format("2006-01-02 15:04:05")
